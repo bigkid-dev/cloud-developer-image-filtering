@@ -18,20 +18,7 @@ import { response, Router } from 'express';
 
   // @TODO1 IMPLEMENT A RESTFUL ENDPOINT
   // GET /filteredimage?image_url={{URL}}
-  app.get("/filteredimage/:image_url", async(req:Request, res:Response) => {
-
-    let { image_url } = req.params;
-    if( !image_url ){
-      return res.status(400)
-                .send("no url")
-    }
-    var filteredpath = filterImageFromURL(image_url)
-    
-    return res.status(200)
-                .send(filteredpath)
-                
-    
-  })
+  
   // endpoint to filter an image from a public url.
   // IT SHOULD
   //    1
@@ -45,7 +32,21 @@ import { response, Router } from 'express';
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
   /**************************************************************************** */
-
+  app.get("/filteredimage", async(req:Request, res:Response) => {
+    const image_url  = req.query.image_url.toString();
+    if( !image_url ){
+      return res.status(400)
+                .send("no Image url is required" );
+    }
+    const filteredpath = await  filterImageFromURL(image_url);
+    
+    return res.status(200)
+                .sendFile(filteredpath, () =>{
+                  deleteLocalFiles([filteredpath]);
+                })
+                
+    
+  })
   //! END @TODO1
   
   // Root Endpoint
